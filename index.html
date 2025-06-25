@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembuat Barcode (QR Code)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        #qrcode img {
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6 md:p-8 text-center">
+        
+        <!-- Judul Aplikasi -->
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">BascameWifi</h1>
+        <p class="text-gray-500 mb-6">Masukkan teks atau angka untuk membuat QR Code.</p>
+        
+        <!-- Input Teks -->
+        <div class="mb-4">
+            <input type="text" id="text-input" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300" value="BascameWifi">
+        </div>
+
+        <!-- Tombol Generate -->
+        <button id="generate-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300 shadow-md">
+            Buat QR Code
+        </button>
+
+        <!-- Area Tampilan QR Code -->
+        <div id="qrcode-container" class="mt-6 p-4 bg-gray-50 rounded-lg min-h-[280px] flex items-center justify-center">
+             <div id="qrcode"></div>
+        </div>
+       
+        <!-- Tombol Unduh -->
+        <a id="download-btn" class="mt-4 w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-md hidden cursor-pointer inline-block">
+            Unduh sebagai PNG
+        </a>
+
+    </div>
+
+    <script>
+        const textInput = document.getElementById('text-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const qrCodeContainer = document.getElementById('qrcode');
+        const downloadBtn = document.getElementById('download-btn');
+
+        let qrcode = null;
+
+        // Fungsi untuk membuat QR Code
+        function generateQRCode() {
+            const text = textInput.value.trim();
+            if (!text) {
+                alert("Silakan masukkan teks atau angka terlebih dahulu.");
+                return;
+            }
+
+            // Membersihkan QR code sebelumnya
+            qrCodeContainer.innerHTML = '';
+            
+            // Membuat QR Code baru
+            qrcode = new QRCode(qrCodeContainer, {
+                text: text,
+                width: 256,
+                height: 256,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            
+            // Menampilkan tombol unduh setelah QR code dibuat
+            setTimeout(() => {
+                 downloadBtn.classList.remove('hidden');
+            }, 100); // Sedikit delay untuk memastikan canvas sudah ter-render
+        }
+
+        // Event listener untuk tombol "Buat QR Code"
+        generateBtn.addEventListener('click', generateQRCode);
+        
+        // Event listener untuk tombol "Unduh"
+        downloadBtn.addEventListener('click', () => {
+            const img = qrCodeContainer.querySelector('img');
+            if (img) {
+                // Menggunakan canvas untuk konversi yang lebih baik
+                const canvas = qrCodeContainer.querySelector('canvas');
+                downloadBtn.href = canvas.toDataURL("image/png");
+                downloadBtn.download = `qrcode-${textInput.value}.png`;
+            } else {
+                alert("Silakan buat QR Code terlebih dahulu.");
+            }
+        });
+
+        // Membuat QR Code awal saat halaman dimuat
+        window.onload = generateQRCode;
+    </script>
+
+</body>
+</html>
